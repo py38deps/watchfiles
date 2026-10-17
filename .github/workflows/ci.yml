@@ -27,7 +27,7 @@ jobs:
           - "3.13"
           - "3.14"
           - "3.14t"
-          - "pypy3.11"
+          - "pypy3.11-v7.3.23"
 
     runs-on: ${{ matrix.os }}
 
@@ -215,7 +215,7 @@ jobs:
         if: runner.os != 'Linux'
         uses: actions/setup-python@v5
         with:
-          python-version: "pypy3.11"
+          python-version: "pypy3.11-v7.3.23"
 
       - name: build pypy wheels
         uses: PyO3/maturin-action@v1.49.3
