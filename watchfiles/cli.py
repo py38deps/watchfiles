@@ -5,10 +5,9 @@ import logging
 import os
 import shlex
 import sys
-from collections.abc import Callable
 from pathlib import Path
 from textwrap import dedent
-from typing import Any, cast
+from typing import Any, Callable, cast
 
 from . import Change
 from .filters import BaseFilter, DefaultFilter, PythonFilter

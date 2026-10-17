@@ -28,10 +28,6 @@ jobs:
           - "3.14"
           - "3.14t"
           - "pypy3.11"
-        exclude:
-          # No CPython 3.8 build for macOS arm64, 3.9+ covers the same abi3 wheel.
-          - os: macos-latest
-            python-version: "3.8"
 
     runs-on: ${{ matrix.os }}
 
@@ -70,7 +66,7 @@ jobs:
 
       - name: install lint dependencies
         run: |
-          python -m pip install "mypy==1.14.1" "ruff==0.15.15" "trio>=0.28.0"
+          python -m pip install "mypy==1.14.1" "ruff==0.15.15" "trio>=0.28.0" anyio
 
       - name: ruff
         run: |
@@ -142,36 +138,23 @@ jobs:
             target: aarch64
           - os: windows-latest
             target: x86_64
-            python-architecture: x64
           - os: windows-latest
             target: aarch64
-            python-architecture: x64
           - os: windows-latest
             target: i686
-            python-architecture: x86
 
     runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v4
 
-      # Linux builds run inside the manylinux/musllinux container, which ships the
-      # interpreters. macOS/Windows need setup-python for the two build versions.
-      - name: set up python 3.10
-        id: python310
+      # Linux builds run inside the manylinux/musllinux container. On macOS/Windows
+      # maturin uses its bundled target sysconfigs, so only a host Python is needed.
+      - name: set up python
         if: runner.os != 'Linux'
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
-          architecture: ${{ matrix.python-architecture || 'x64' }}
-
-      - name: set up python 3.14t
-        id: python314t
-        if: runner.os != 'Linux'
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.14t"
-          architecture: ${{ matrix.python-architecture || 'x64' }}
+          python-version: "3.13"
 
       # Mirror the upstream wheel set: cp310-abi3 plus the free-threaded cp314 wheel.
       # Free-threaded interpreters ignore the abi3 feature, so both come from one build.
@@ -182,7 +165,7 @@ jobs:
           manylinux: ${{ matrix.manylinux }}
           args: >-
             --release --out dist
-            --interpreter "${{ steps.python310.outputs.python-path || '3.10' }}" "${{ steps.python314t.outputs.python-path || '3.14t' }}"
+            --interpreter 3.10 3.14t
             --no-default-features --features abi3-py310
 
       # Extra backport wheels: the same platform tags as the cp310 wheels, but using
@@ -196,7 +179,7 @@ jobs:
           manylinux: ${{ matrix.manylinux }}
           args: >-
             --release --out dist
-            --interpreter "${{ steps.python310.outputs.python-path || '3.10' }}"
+            --interpreter 3.10
             --no-default-features --features abi3-py38
 
       - name: upload wheels
