@@ -42,7 +42,9 @@ def anyio_backend():
 
 
 def sleep_write(path: Path):
-    sleep(0.1)
+    # FSEvents watcher startup on free-threaded macOS can exceed 0.1s under load,
+    # so give the watcher time to start before creating the file (CI flake).
+    sleep(0.5)
     path.write_text('hello')
 
 
