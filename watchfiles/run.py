@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import contextlib
 import json
 import logging
@@ -32,7 +34,7 @@ def run_process(
     target: str | Callable[..., Any],
     args: tuple[Any, ...] = (),
     kwargs: dict[str, Any] | None = None,
-    target_type: "Literal['function', 'command', 'auto']" = 'auto',
+    target_type: Literal['function', 'command', 'auto'] = 'auto',
     callback: Callable[[set[FileChange]], None] | None = None,
     watch_filter: Callable[[Change, str], bool] | None = DefaultFilter(),
     grace_period: float = 0,
@@ -160,7 +162,7 @@ async def arun_process(
     target: str | Callable[..., Any],
     args: tuple[Any, ...] = (),
     kwargs: dict[str, Any] | None = None,
-    target_type: "Literal['function', 'command', 'auto']" = 'auto',
+    target_type: Literal['function', 'command', 'auto'] = 'auto',
     callback: Callable[[set[FileChange]], Any] | None = None,
     watch_filter: Callable[[Change, str], bool] | None = DefaultFilter(),
     grace_period: float = 0,
@@ -249,11 +251,11 @@ def split_cmd(cmd: str) -> list[str]:
 
 def start_process(
     target: str | Callable[..., Any],
-    target_type: "Literal['function', 'command']",
+    target_type: Literal['function', 'command'],
     args: tuple[Any, ...],
     kwargs: dict[str, Any] | None,
     changes: set[FileChange] | None = None,
-) -> 'CombinedProcess':
+) -> CombinedProcess:
     if changes is None:
         changes_env_var = '[]'
     else:
@@ -283,7 +285,7 @@ def start_process(
     return CombinedProcess(process)
 
 
-def detect_target_type(target: str | Callable[..., Any]) -> "Literal['function', 'command']":
+def detect_target_type(target: str | Callable[..., Any]) -> Literal['function', 'command']:
     """
     Used by [`run_process`][watchfiles.run_process], [`arun_process`][watchfiles.arun_process]
     and indirectly the CLI to determine the target type with `target_type` is `auto`.
@@ -316,7 +318,7 @@ def detect_target_type(target: str | Callable[..., Any]) -> "Literal['function',
 
 
 class CombinedProcess:
-    def __init__(self, p: 'SpawnProcess | subprocess.Popen[bytes]'):
+    def __init__(self, p: SpawnProcess | subprocess.Popen[bytes]):
         self._p = p
         assert self.pid is not None, 'process not yet spawned'
 

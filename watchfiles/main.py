@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import os
 import sys
@@ -5,7 +7,7 @@ import warnings
 from collections.abc import AsyncGenerator, Callable, Generator
 from enum import IntEnum
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Tuple
 
 import anyio
 
@@ -32,7 +34,7 @@ class Change(IntEnum):
         return self.name
 
 
-FileChange = tuple[Change, str]
+FileChange = Tuple[Change, str]
 """
 A tuple representing a file change, first element is a [`Change`][watchfiles.Change] member, second is the path
 of the file or directory that changed.
@@ -40,11 +42,11 @@ of the file or directory that changed.
 
 if TYPE_CHECKING:
     import asyncio
-    from typing import Protocol
+    from typing import Protocol, Union
 
     import trio
 
-    AnyEvent = anyio.Event | asyncio.Event | trio.Event
+    AnyEvent = Union[anyio.Event, asyncio.Event, trio.Event]
 
     class AbstractEvent(Protocol):
         def is_set(self) -> bool: ...
@@ -52,10 +54,10 @@ if TYPE_CHECKING:
 
 def watch(
     *paths: Path | str,
-    watch_filter: Callable[['Change', str], bool] | None = DefaultFilter(),
+    watch_filter: Callable[[Change, str], bool] | None = DefaultFilter(),
     debounce: int = 1_600,
     step: int = 50,
-    stop_event: 'AbstractEvent | None' = None,
+    stop_event: AbstractEvent | None = None,
     rust_timeout: int = 5_000,
     yield_on_timeout: bool = False,
     debug: bool | None = None,
@@ -156,7 +158,7 @@ async def awatch(  # C901
     watch_filter: Callable[[Change, str], bool] | None = DefaultFilter(),
     debounce: int = 1_600,
     step: int = 50,
-    stop_event: 'AnyEvent | None' = None,
+    stop_event: AnyEvent | None = None,
     rust_timeout: int | None = None,
     yield_on_timeout: bool = False,
     debug: bool | None = None,

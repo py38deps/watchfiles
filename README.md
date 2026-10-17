@@ -23,7 +23,9 @@ see [the migration guide](https://watchfiles.helpmanual.io/migrating/) for more 
 
 ## Installation
 
-**watchfiles** requires Python 3.10 - 3.15.
+**watchfiles** requires Python 3.8 - 3.15. The backport additionally publishes
+`cp38-abi3` wheels, so Python 3.8 and 3.9 use the 3.8 stable ABI while
+CPython 3.10+ uses the `cp310-abi3` wheels.
 
 ```bash
 pip install watchfiles

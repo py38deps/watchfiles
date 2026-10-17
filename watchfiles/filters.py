@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import os
 import re
@@ -41,7 +43,7 @@ class BaseFilter:
         self._ignore_entity_regexes = tuple(re.compile(r) for r in self.ignore_entity_patterns)
         self._ignore_paths = tuple(map(str, self.ignore_paths))
 
-    def __call__(self, change: 'Change', path: str) -> bool:
+    def __call__(self, change: Change, path: str) -> bool:
         """
         Instances of `BaseFilter` subclasses can be used as callables.
         Args:
@@ -146,5 +148,5 @@ class PythonFilter(DefaultFilter):
         self.extensions = ('.py', '.pyx', '.pyd') + tuple(extra_extensions)
         super().__init__(ignore_paths=ignore_paths)
 
-    def __call__(self, change: 'Change', path: str) -> bool:
+    def __call__(self, change: Change, path: str) -> bool:
         return path.endswith(self.extensions) and super().__call__(change, path)
